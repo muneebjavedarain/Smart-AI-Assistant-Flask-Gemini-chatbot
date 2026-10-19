@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smart AI Assistant powered by Google Gemini.">
+    <title>Smart AI Assistant</title>
+    <script>
+        // Apply the saved theme before the page paints (no flash).
+        (function () {
+            var theme = "light";
+            try {
+                theme = localStorage.getItem("theme") ||
+                    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+            } catch (e) {}
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='features.css') }}">
+</head>
+<body>
+    <div class="app-container">
+
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">&#10022;</div>
+                <div>
+                    <h2>Smart AI</h2>
+                    <span>Personal Assistant</span>
+                </div>
+            </div>
+
+            <button class="new-chat-btn" id="newChatBtn">
+                <span>&#65291;</span> New conversation
+            </button>
+
+            <div class="sidebar-section">
+                <p class="section-label">SIGNED IN AS</p>
+                <div class="sidebar-item active">
+                    <span>&#10023;</span> {{ username }}
+                </div>
+            </div>
+
+            <div class="sidebar-bottom">
+                <div class="status-dot"></div>
+                <div>
+                    <strong>AI Assistant</strong>
+                    <p>Ready to help you</p>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <span class="mobile-brand">&#10022; Smart AI</span>
+                    <p class="topbar-subtitle">Your everyday AI companion</p>
+                </div>
+
+                <div class="topbar-actions">
+                    <select id="personaSelect" class="persona-select" aria-label="Assistant role" title="Assistant role"></select>
+
+                    <button type="button" id="autoReadBtn" class="icon-btn" title="Read answers aloud automatically">&#128264; Auto-read</button>
+                    <button type="button" id="themeBtn" class="icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode">&#9790;</button>
+
+                    <div class="export-buttons">
+                        <button type="button" id="exportTxtBtn" class="export-btn">&#8595; TXT</button>
+                        <button type="button" id="exportMdBtn" class="export-btn">&#8595; MD</button>
+                    </div>
+
+                    <button type="button" id="logoutBtn" class="icon-btn" title="Log out">Logout</button>
+                </div>
+            </header>
+
+            <section class="chat-area" id="chatArea">
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-icon">&#10022;</div>
+                    <p class="eyebrow">YOUR PERSONAL AI ASSISTANT</p>
+                    <h1>How can I help you<br><span>today?</span></h1>
+                    <p class="welcome-description">
+                        Ask questions, attach a PDF, speak in Urdu or English,
+                        or get help with your everyday tasks.
+                    </p>
+
+                    <div class="suggestion-grid">
+                        <button class="suggestion-card" data-prompt="Explain artificial intelligence in simple words.">
+                            <span class="suggestion-icon purple">&#10023;</span>
+                            <strong>Learn something</strong>
+                            <span>Explain a topic simply</span>
+                            <span class="card-arrow">&#8599;</span>
+                        </button>
+
+                        <button class="suggestion-card" data-prompt="Give me five creative ideas for a small online business.">
+                            <span class="suggestion-icon orange">&#10035;</span>
+                            <strong>Brainstorm ideas</strong>
+                            <span>Discover new possibilities</span>
+                            <span class="card-arrow">&#8599;</span>
+                        </button>
+
+                        <button class="suggestion-card" data-prompt="Create a practical daily study schedule for a university student.">
+                            <span class="suggestion-icon green">&#9636;</span>
+                            <strong>Plan my day</strong>
+                            <span>Organize tasks and goals</span>
+                            <span class="card-arrow">&#8599;</span>
+                        </button>
+
+                        <button class="suggestion-card" data-prompt="Write a friendly and professional email asking about a job opportunity.">
+                            <span class="suggestion-icon blue">&#9993;</span>
+                            <strong>Write for me</strong>
+                            <span>Create useful written content</span>
+                            <span class="card-arrow">&#8599;</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="messages" id="messages" aria-live="polite"></div>
+            </section>
+
+            <section class="composer-section">
+                <div class="edit-banner" id="editBanner" hidden>
+                    <span>Editing a message. Everything after it will be replaced.</span>
+                    <button type="button" id="cancelEditBtn">Cancel</button>
+                </div>
+
+                <div class="doc-bar" id="docBar" hidden></div>
+
+                <form class="composer" id="chatForm">
+                    <textarea
+                        id="messageInput"
+                        placeholder="Message Smart AI..."
+                        rows="1"
+                        dir="auto"
+                        maxlength="4000"
+                        aria-label="Write your message"
+                    ></textarea>
+
+                    <div class="composer-footer">
+                        <div class="composer-tools">
+                            <button type="button" id="attachBtn" class="tool-btn" title="Attach a PDF or TXT file" aria-label="Attach file">&#128206;</button>
+                            <input type="file" id="fileInput" accept=".pdf,.txt" hidden>
+
+                            <button type="button" id="micBtn" class="tool-btn" title="Voice input" aria-label="Voice input">&#127908;</button>
+                            <select id="voiceLang" class="voice-lang" title="Voice language" aria-label="Voice language">
+                                <option value="ur-PK">Urdu</option>
+                                <option value="en-US">English</option>
+                            </select>
+                        </div>
+
+                        <span class="input-hint">Enter to send, Shift+Enter for new line.</span>
+
+                        <button type="submit" class="send-btn" id="sendBtn" aria-label="Send message">&#8593;</button>
+                    </div>
+                </form>
+                <p class="disclaimer">
+                    AI can make mistakes. Check important information.
+                </p>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

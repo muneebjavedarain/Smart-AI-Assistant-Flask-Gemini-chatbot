@@ -1,0 +1,7 @@
+Flask>=3.0
+Flask-Login>=0.6.3
+Flask-Limiter>=3.5
+google-genai
+python-dotenv
+pypdf>=4.0
+gunicorn; platform_system != "Windows"

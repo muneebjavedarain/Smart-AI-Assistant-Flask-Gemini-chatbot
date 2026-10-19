@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart AI Assistant - Sign in</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            background: #f7f8fc;
+            color: #202236;
+        }
+        .card {
+            width: 100%;
+            max-width: 390px;
+            padding: 32px 28px;
+            background: #fff;
+            border: 1px solid #e9eaf2;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(30, 33, 65, 0.08);
+        }
+        .logo {
+            width: 52px; height: 52px;
+            margin: 0 auto 14px;
+            display: grid; place-items: center;
+            border-radius: 16px;
+            color: #fff; font-size: 28px;
+            background: linear-gradient(135deg, #9c80ff, #6659e8);
+        }
+        h1 { text-align: center; font-size: 22px; margin-bottom: 4px; }
+        .sub { text-align: center; color: #85889c; font-size: 13px; margin-bottom: 22px; }
+        .tabs { display: flex; gap: 6px; padding: 4px; margin-bottom: 18px; background: #f0efff; border-radius: 12px; }
+        .tabs button {
+            flex: 1; padding: 9px; border: 0; border-radius: 9px;
+            background: transparent; color: #5149a7; font-weight: 600; cursor: pointer;
+        }
+        .tabs button.active { background: #fff; box-shadow: 0 2px 8px rgba(80, 70, 160, .12); }
+        label { display: block; font-size: 12px; font-weight: 600; margin: 12px 0 6px; }
+        input {
+            width: 100%; padding: 12px 13px; font-size: 14px;
+            border: 1px solid #dcdeea; border-radius: 10px; outline: none;
+        }
+        input:focus { border-color: #7065e8; }
+        .submit {
+            width: 100%; margin-top: 20px; padding: 12px;
+            border: 0; border-radius: 10px; cursor: pointer;
+            background: #7065e8; color: #fff; font-size: 14px; font-weight: 700;
+        }
+        .submit:hover { background: #5b50d4; }
+        .submit:disabled { opacity: .6; cursor: not-allowed; }
+        .error { min-height: 18px; margin-top: 12px; color: #c44343; font-size: 13px; text-align: center; }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <div class="logo">&#10022;</div>
+        <h1>Smart AI Assistant</h1>
+        <p class="sub">Sign in to continue</p>
+
+        <div class="tabs">
+            <button type="button" id="tabLogin" class="active">Log in</button>
+            <button type="button" id="tabRegister">Create account</button>
+        </div>
+
+        <form id="authForm">
+            <label for="username">Username</label>
+            <input id="username" name="username" autocomplete="username" required minlength="3" maxlength="30">
+
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="128">
+
+            <button type="submit" class="submit" id="submitBtn">Log in</button>
+            <p class="error" id="errorBox" role="alert"></p>
+        </form>
+    </main>
+
+    <script>
+        let mode = "login";
+
+        const tabLogin = document.getElementById("tabLogin");
+        const tabRegister = document.getElementById("tabRegister");
+        const submitBtn = document.getElementById("submitBtn");
+        const errorBox = document.getElementById("errorBox");
+        const passwordInput = document.getElementById("password");
+
+        function setMode(next) {
+            mode = next;
+            tabLogin.classList.toggle("active", mode === "login");
+            tabRegister.classList.toggle("active", mode === "register");
+            submitBtn.textContent = mode === "login" ? "Log in" : "Create account";
+            passwordInput.autocomplete = mode === "login" ? "current-password" : "new-password";
+            errorBox.textContent = "";
+        }
+
+        tabLogin.addEventListener("click", () => setMode("login"));
+        tabRegister.addEventListener("click", () => setMode("register"));
+
+        document.getElementById("authForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            errorBox.textContent = "";
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(`/api/${mode}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: document.getElementById("username").value,
+                        password: passwordInput.value
+                    })
+                });
+
+                let data = {};
+                try { data = await response.json(); } catch (_) {}
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Something went wrong.");
+                }
+
+                window.location.href = "/";
+            } catch (error) {
+                errorBox.textContent = error.message;
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

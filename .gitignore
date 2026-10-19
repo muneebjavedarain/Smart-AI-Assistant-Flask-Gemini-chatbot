@@ -1,0 +1,6 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+smart_ai.db
+CHATBOT_ALL_FILES.txt
